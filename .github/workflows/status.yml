@@ -1,7 +1,7 @@
 name: Generate Stats Images
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   schedule:
     - cron: "5 0 * * *"
   workflow_dispatch:
@@ -13,29 +13,29 @@ jobs:
   build:
     runs-on: ubuntu-slim
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Install uv
-      uses: astral-sh/setup-uv@v5
-      with:
-        python-version: '3.12'  # uv installs and manages Python directly
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12" # uv installs and manages Python directly
 
-    - name: Install requirements
-      run: uv pip install --system -r requirements.txt
+      - name: Install requirements
+        run: uv pip install -r requirements.txt
 
-    - name: Generate images
-      run: python3 generate_images.py
-      env:
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        EXCLUDED: ${{ secrets.EXCLUDED }}
-        EXCLUDED_LANGS: ${{ secrets.EXCLUDED_LANGS }}
-        EXCLUDE_FORKED_REPOS: true
+      - name: Generate images
+        run: uv run python generate_images.py
+        env:
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EXCLUDED: ${{ secrets.EXCLUDED }}
+          EXCLUDED_LANGS: ${{ secrets.EXCLUDED_LANGS }}
+          EXCLUDE_FORKED_REPOS: true
 
-    - name: Commit to the repo
-      run: |
-        git config --global user.name "jstrieb/github-stats"
-        git config --global user.email "github-stats[bot]@jstrieb.github.io"
-        git add .
-        git commit -m 'Update generated files' || true
-        git push
+      - name: Commit to the repo
+        run: |
+          git config --global user.name "jstrieb/github-stats"
+          git config --global user.email "github-stats[bot]@jstrieb.github.io"
+          git add .
+          git commit -m 'Update generated files' || true
+          git push
