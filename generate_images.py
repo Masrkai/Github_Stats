@@ -1,12 +1,15 @@
 #!/usr/bin/python3
 
-import asyncio
 import os
 import re
+import asyncio
 
 import aiohttp
 
 from github_stats import Stats
+from dotenv import load_dotenv
+
+load_dotenv()  # Safe; does nothing if .env is missing, and never overrides
 
 
 ################################################################################

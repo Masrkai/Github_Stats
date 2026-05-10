@@ -65,15 +65,16 @@ class Queries(object):
                     return result
         return dict()
 
-    async def query_rest(self, path: str, params: Optional[Dict] = None) -> Dict:
+    async def query_rest(self, path: str, params: Optional[Dict] = None, max_retries: int = 10) -> Dict:
         """
         Make a request to the REST API
         :param path: API path to query
         :param params: Query parameters to be passed to the API
+        :param max_retries: Number of times to retry on 202 responses
         :return: deserialized REST JSON output
         """
 
-        for _ in range(60):
+        for _ in range(max_retries):
             headers = {
                 "Authorization": f"token {self.access_token}",
             }
@@ -257,7 +258,8 @@ class Stats(object):
         session: aiohttp.ClientSession,
         exclude_repos: Optional[Set] = None,
         exclude_langs: Optional[Set] = None,
-        ignore_forked_repos: bool = False,
+        ignore_forked_repos: bool = True,
+        max_retries: int = None,
     ):
         self.username = username
         self._ignore_forked_repos = ignore_forked_repos
@@ -273,6 +275,8 @@ class Stats(object):
         self._repos: Optional[Set[str]] = None
         self._lines_changed: Optional[Tuple[int, int]] = None
         self._views: Optional[int] = None
+        self._max_retries = max_retries if max_retries is not None else int(os.getenv("GITHUB_MAX_RETRIES", "10"))
+
 
     async def to_str(self) -> str:
         """
